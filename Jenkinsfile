@@ -5,7 +5,9 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'uday', url: 'https://github.com/Uday-63/poultry-healthy-hens-java.git']])
+                git branch: 'main',
+                credentialsId: 'uday',
+                url: 'https://github.com/Uday-63/poultry-healthy-hens-java.git'
             }
         }
 
@@ -17,19 +19,18 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t healthy-hens .'
+                sh 'docker build -t healthy-hens:latest .'
             }
         }
 
         stage('Run Container') {
-    steps {
-        sh '''
-        docker stop healthy-hens || true
-        docker rm healthy-hens || true
-        docker run -d -p 2000:8080 --name healthy-hens healthy-hens
-        '''
-    }
-}
+            steps {
+                sh '''
+                docker rm -f healthy-hens || true
+                docker run -d -p 2000:8080 --name healthy-hens healthy-hens:latest
+                '''
+            }
+        }
 
     }
 }
